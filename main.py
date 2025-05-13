@@ -1,38 +1,58 @@
 """
-This is a hello world add-on for DocumentCloud.
-
-It demonstrates how to write a add-on which can be activated from the
-DocumentCloud add-on system and run using Github Actions.  It receives data
-from DocumentCloud via the request dispatch and writes data back to
-DocumentCloud using the standard API
+This Add-On uploads files from a MuckRock request to
+a  project on your DocumentCloud
 """
-
+import sys
+from muckrock import MuckRock
 from documentcloud.addon import AddOn
 
 
-class HelloWorld(AddOn):
+
+class RequestDownloader(AddOn):
     """An example Add-On for DocumentCloud."""
 
     def main(self):
         """The main add-on functionality goes here."""
         # fetch your add-on specific data
-        name = self.data.get("name", "world")
+        project_name = self.data.get("project_name")
+        request_id = self.data.get("request_id")
 
-        self.set_message("Hello World start!")
+        self.set_message(f"Fetching files from MuckRock request {request_id}")
+        mr_client = MuckRock()
 
-        # add a hello note to the first page of each selected document
-        for document in self.get_documents():
-            # get_documents will iterate through all documents efficiently,
-            # either selected or by query, dependeing on which is passed in
-            document.annotations.create(f"Hello {name}!", 0)
+        request = mr_client.requests.retrieve(request_id)
 
-        with open("hello.txt", "w+") as file_:
-            file_.write("Hello world!")
-            self.upload_file(file_)
+        # Retrieves all of the communications from the request
+        comms_list = request.get_communications()
 
-        self.set_message("Hello World end!")
-        self.send_mail("Hello World!", "We finished!")
+        all_files = []
+
+        # For each communication, if there is an attached file, add the file to a list.
+        for comm in comms_list:
+            files = list(comm.get_files())
+            if files:  # Filters out comms with no actual files
+                all_files.extend(files)
+
+        # Build out a list of file URLs we can use to upload to DocumentCloud
+        file_urls = []
+        for file in all_files:
+            file_urls.append(file.ffile)
+
+        try:
+            project = self.client.projects.create(project_name)
+        except Exception as e:
+            self.set_message("Failed to create a project, check Github logs")
+            print(e)
+            sys.exit(1)
+        self.set_message("Uploading the documents to DocumentCloud")
+        try:
+            self.client.documents.upload_urls(file_urls, projects=[project.id])
+            self.set_message("Successfully uploaded all documents to DocumentCloud")
+        except Exception as e:
+            print(e)
+            self.set_message("Failed to upload documents to DocumentCloud, check Github logs")
+            sys.exit(1)
 
 
 if __name__ == "__main__":
-    HelloWorld().main()
+    RequestDownloader().main()

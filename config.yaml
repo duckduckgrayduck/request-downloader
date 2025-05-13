@@ -1,29 +1,25 @@
 # The title is the title of your Add-On
 title: Hello World
 # The description will be shown above the form when activating the Add-On
-description: This is an updated simple test add-on
+description: This Add-On downloads files from a MuckRock request and uploads them to a project on DocumentCloud. 
 # Optional instructions field to describe how to use the Add-On
-instructions: This is a sample instruction.
+instructions: Provide a request ID for the request you would like to retrieve from and a project ID for the project you would like to upload to. 
 # Top level type should always be object
 type: object
-# How does this add-on accept documents
-# If more than one type is specified, the user will be prompted to choose one
-documents:
-  # By the currently selected documents
-  - selected
-  # By the current search query
-  - query
-# Properties are the fields for your form
 properties:
   # the key is the name of the variable that will be returned to your code
-  name:
+  request_id:
     # the title is what will be shown as the form label
-    title: Name
+    title: Request ID
     # a string is text
+    type: integer
+  project_name:
+    title: Project name
+    description: Project name for the newly created DocumentCloud projects where documents will be uploaded
     type: string
 # Categories are what type of Add-On this is. Used to sort the Add-On in the Add-On menu. 
 categories: 
-  - file
+  - export
 # Acceptable categories are premium, ai, export, bulk, file,  monitor, statistical, and extraction. 
 # You can read more about DocumentCloud Add-On categories here: https://www.documentcloud.org/help/add-ons#types-of-add-ons
 version: 2
