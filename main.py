@@ -8,7 +8,7 @@ from documentcloud.addon import AddOn
 
 
 
-class RequestDownloader(AddOn):
+class MuckRockExporter(AddOn):
     """An example Add-On for DocumentCloud."""
 
     def main(self):
@@ -55,4 +55,4 @@ class RequestDownloader(AddOn):
 
 
 if __name__ == "__main__":
-    RequestDownloader().main()
+    MuckRockExporter().main()

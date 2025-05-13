@@ -1,5 +1,5 @@
 # The title is the title of your Add-On
-title: Hello World
+title: MuckRock Exporter
 # The description will be shown above the form when activating the Add-On
 description: This Add-On downloads files from a MuckRock request and uploads them to a project on DocumentCloud. 
 # Optional instructions field to describe how to use the Add-On
